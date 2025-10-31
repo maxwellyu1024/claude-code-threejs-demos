@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>重力表情符号演示 - Emoji Physics Demo</title>
+
+        <style>
+            :root {
+                --spacing-horz: 32px;
+
+                --color-clay: #d97757;
+                --color-clay-shimmer: rgba(217, 119, 87, 0.5);
+                --color-olive: #788c5d;
+                --color-dark-grey: #1e1e1e;
+                --color-white: #faf9f5;
+                --color-true-white: #ffffff;
+                --color-light-grey: #b0aea5;
+                --color-fg-tertiary: #5e5d59;
+
+                --font-size-body-3: 15px;
+                --line-height-body-3: 140%;
+                --letter-spacing-body-3: 0;
+                --font-weight-body-3: 400;
+
+                --radius-sm: 24px;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    "Anthropic Mono", "Monaco", "Courier New", monospace;
+                background: var(--color-true-white);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .claude-gravity-demo {
+                font-family: "Anthropic Mono", monospace;
+                background: var(--color-true-white);
+                width: 100%;
+                max-width: 1440px;
+                background-color: var(--color-white);
+                position: relative;
+                overflow: hidden;
+                border-radius: var(--radius-sm);
+                display: flex;
+            }
+
+            .claude-gravity-demo canvas {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                cursor: pointer;
+                touch-action: none;
+            }
+
+            .claude-gravity-demo .info {
+                position: relative;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+                color: var(--color-dark-grey);
+                padding: 20px;
+
+                font-size: var(--font-size-body-3);
+                line-height: var(--line-height-body-3);
+                letter-spacing: var(--letter-spacing-body-3);
+                font-weight: var(--font-weight-body-3);
+            }
+
+            .claude-gravity-demo .info__title {
+                display: flex;
+                flex-direction: column;
+                white-space: pre;
+                color: var(--color-clay);
+                font-size: 16px;
+                line-height: 100%;
+                letter-spacing: 0;
+                font-weight: 400;
+            }
+
+            .claude-gravity-demo .info__title-label {
+                color: var(--color-dark-grey);
+            }
+
+            .claude-gravity-demo .info__list-item-desktop {
+                display: none;
+            }
+
+            .claude-gravity-demo .info__todos {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                row-gap: 10px;
+                padding-left: 20px;
+            }
+
+            .claude-gravity-demo .info__todos-title {
+                color: var(--color-dark-grey);
+                font-weight: 700;
+                position: relative;
+            }
+
+            .claude-gravity-demo .info__todos-title::before {
+                content: "";
+                position: absolute;
+                top: calc(50% - 1px);
+                right: calc(100% + 12px);
+                width: 8px;
+                height: 8px;
+                background-color: var(--color-olive);
+                border-radius: 50%;
+                transform: translateY(-50%);
+            }
+
+            .claude-gravity-demo .info__todos-list {
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                text-align: left;
+                color: var(--color-olive);
+                padding-left: 18px;
+            }
+
+            .claude-gravity-demo .info__todos-list li:first-child {
+                position: relative;
+            }
+
+            .claude-gravity-demo .info__todos-list li:first-child::before {
+                content: "⎿";
+                display: inline-block;
+                position: absolute;
+                top: 0;
+                right: calc(100% + 8px);
+            }
+
+            .claude-gravity-demo .loading {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: var(--color-white);
+                font-size: 12px;
+                z-index: 20;
+                pointer-events: none;
+            }
+
+            .claude-gravity-demo__canvas-container {
+                position: relative;
+                overflow: hidden;
+                user-select: none;
+            }
+
+            .demo-empty-state {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                z-index: 10;
+                pointer-events: none;
+                font-size: var(--font-size-body-3);
+                line-height: var(--line-height-body-3);
+                font-weight: var(--font-weight-body-3);
+                color: var(--color-fg-tertiary);
+            }
+
+            .demo-empty-state__icon {
+                opacity: 0.5;
+            }
+
+            .demo-empty-state__icon svg {
+                width: 36px;
+                height: 36px;
+            }
+
+            .demo-empty-state__text {
+                text-align: center;
+            }
+
+            @media (max-width: 800px) {
+                .claude-gravity-demo {
+                    flex-direction: column-reverse;
+                }
+
+                .claude-gravity-demo .info {
+                    padding-top: 20px;
+                    max-height: 200px;
+                    overflow-x: clip;
+                    overflow-y: auto;
+                    flex: unset;
+                    mask-image: linear-gradient(
+                        to bottom,
+                        transparent 0%,
+                        black 20px
+                    );
+                    font-size: 12px;
+                    row-gap: 20px;
+                }
+
+                .claude-gravity-demo .info__title {
+                    font-size: 12px;
+                }
+
+                .claude-gravity-demo__canvas-container {
+                    width: 100%;
+                    flex: 1;
+                    aspect-ratio: 4/5;
+                }
+            }
+
+            @media (min-width: 800px) {
+                .info__list-item-desktop {
+                    display: block;
+                }
+
+                .info__list-item-mobile {
+                    display: none;
+                }
+
+                .claude-gravity-demo__canvas-container {
+                    width: 66%;
+                    mask-image: linear-gradient(
+                        to right,
+                        transparent 0%,
+                        black 20px
+                    );
+                    min-height: 680px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="claude-gravity-demo" data-gravity-demo>
+            <div class="info">
+                <h2 class="info__title">
+                    <span>╭────────────────────────────╮</span>
+                    <span>│ │</span>
+                    <span
+                        >│ ✶
+                        <span class="info__title-label"
+                            >Welcome to Claude Code!</span
+                        >
+                        │</span
+                    >
+                    <span>│ │</span>
+                    <span>╰────────────────────────────╯</span>
+                </h2>
+
+                <p>
+                    > Create an interactive tool that shoots out emojis using
+                    real-world physics
+                </p>
+
+                <div class="info__todos">
+                    <h3 class="info__todos-title">Update Todos</h3>
+                    <ul class="info__todos-list">
+                        <li>☒ Setup scene</li>
+                        <li>☒ Set up Cannon.js physics world with gravity</li>
+                        <li>☒ Build instanced mesh system for performance</li>
+                        <li>
+                            ☒ Apply physics bodies with random velocity/spin
+                        </li>
+                        <li>☒ Continuous spawning while mouse held down</li>
+                        <li>☒ Auto-cleanup when reaching max emoji limit</li>
+                    </ul>
+                </div>
+
+                <p>
+                    Done! Click and hold to create emoji fountains with
+                    realistic physics. Take a look and let me know your
+                    thoughts.
+                </p>
+            </div>
+
+            <div
+                class="claude-gravity-demo__canvas-container"
+                data-gravity-canvas-container
+            >
+                <div data-gravity-empty-state class="demo-empty-state">
+                    <div class="demo-empty-state__icon">
+                        <svg
+                            width="37"
+                            height="36"
+                            viewBox="0 0 37 36"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M18.0108 5.18311C18.5572 3.79595 20.1251 3.11311 21.5123 3.65909L26.5379 5.63839C27.9248 6.18499 28.6062 7.75286 28.0602 9.13995L21.0026 27.0556C20.8316 27.4894 20.5509 27.8707 20.1905 28.163L20.0323 28.2825L14.3739 32.2165C13.6324 32.732 12.6223 32.3854 12.3313 31.5644L12.2838 31.3939L10.8266 24.6579C10.714 24.1369 10.7596 23.5929 10.9549 23.097L18.0108 5.18311ZM12.6283 23.7579C12.5636 23.9228 12.5489 24.1033 12.5862 24.2765L13.901 30.3532L19.0039 26.806L19.1076 26.7216C19.2036 26.6312 19.2786 26.52 19.3274 26.3964L24.0752 14.3413L17.3762 11.7028L12.6283 23.7579ZM20.8532 5.33429C20.3907 5.15221 19.8681 5.37987 19.686 5.84229L18.0354 10.0276L24.7344 12.6679L26.385 8.48077C26.5671 8.01831 26.3394 7.49575 25.877 7.31358L20.8532 5.33429Z"
+                                fill="currentColor"
+                            />
+                        </svg>
+                    </div>
+                    <p class="demo-empty-state__text">
+                        Click and drag to draw emojis
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cannon.js 物理引擎 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+
+        <!-- GSAP 动画库 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+        <!-- Three.js Import Map -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js"
+                }
+            }
+        </script>
+
+        <!-- 主要脚本 -->
+        <script type="module">
+            import * as THREE from "three";
+
+            const textureSize = 256;
+
+            class EmojiPhysicsDemo {
+                constructor() {
+                    this.container = document.querySelector(
+                        "[data-gravity-canvas-container]",
+                    );
+                    this.emptyState = document.querySelector(
+                        "[data-gravity-empty-state]",
+                    );
+
+                    this.emojiIndex = 0;
+                    this.emojiChars = [
+                        "😀",
+                        "😍",
+                        "😝",
+                        "🤨",
+                        "😵",
+                        "😎",
+                        "😵‍💫",
+                    ];
+                    this.scene = null;
+                    this.camera = null;
+                    this.renderer = null;
+                    this.world = null;
+                    this.emojis = [];
+                    this.mouse = { x: 0, y: 0 };
+                    this.maxEmojis = 500;
+                    this.isMouseDown = false;
+                    this.spawnInterval = null;
+                    this.walls = [];
+                    this.emojiSize = 1;
+                    this.emoji = this.emojiChars[this.emojiIndex];
+                    this.gravityY = -10;
+                    this.gravityX = 2;
+                    this.emptyStateVisible = true;
+                    this.isInitialized = false;
+                    this.animationId = null;
+
+                    this.emojiTypes = {};
+                    this.emojiTypeOrder = [];
+
+                    this.init();
+                }
+
+                init() {
+                    // Check if container is visible before initializing
+                    if (
+                        this.container.offsetWidth === 0 ||
+                        this.container.offsetHeight === 0
+                    ) {
+                        // Container is hidden, wait for it to become visible
+                        this.waitForVisibility();
+                        return;
+                    }
+
+                    const ww = this.container.clientWidth;
+
+                    this.emojiSize = ww < 800 ? 1.35 : 1.25;
+
+                    this.scene = new THREE.Scene();
+
+                    const aspect =
+                        this.container.clientWidth /
+                        this.container.clientHeight;
+                    const frustumSize = 20;
+
+                    this.camera = new THREE.OrthographicCamera(
+                        (-frustumSize * aspect) / 2,
+                        (frustumSize * aspect) / 2,
+                        frustumSize / 2,
+                        -frustumSize / 2,
+                        0.1,
+                        1000,
+                    );
+                    this.camera.position.z = 10;
+
+                    // Renderer
+                    this.renderer = new THREE.WebGLRenderer({
+                        antialias: true,
+                        alpha: true,
+                    });
+                    this.renderer.setSize(
+                        this.container.clientWidth,
+                        this.container.clientHeight,
+                    );
+                    this.renderer.setPixelRatio(
+                        Math.min(window.devicePixelRatio, 2),
+                    );
+                    this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+                    this.renderer.toneMapping = THREE.NoToneMapping;
+                    this.renderer.toneMappingExposure = 1;
+                    this.renderer.domElement.id = "emoji-gravity-canvas";
+                    this.container?.appendChild(this.renderer.domElement);
+
+                    // Physics
+                    this.world = new CANNON.World();
+                    this.world.gravity.set(this.gravityX, this.gravityY, 0);
+                    this.world.broadphase = new CANNON.NaiveBroadphase();
+                    this.world.defaultContactMaterial.friction = 0.001;
+                    this.world.defaultContactMaterial.restitution = 0.2;
+
+                    this.createWalls();
+
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+                    this.scene.add(ambientLight);
+
+                    this.setupEmojiTextures();
+
+                    this.setupEmoji(this.emoji);
+
+                    // Now that renderer is created, set up event listeners and start animation
+                    this.setupEventListeners();
+                    this.animate();
+
+                    this.isInitialized = true;
+                }
+
+                waitForVisibility() {
+                    // Use Intersection Observer to detect when container becomes visible
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting && !this.isInitialized) {
+                                this.init();
+                                observer.disconnect();
+                            }
+                        });
+                    });
+                    observer.observe(this.container);
+                }
+
+                // Add method to reinitialize when tab becomes visible
+                reinitialize() {
+                    if (this.isInitialized) {
+                        // Stop current animation
+                        if (this.animationId) {
+                            cancelAnimationFrame(this.animationId);
+                        }
+
+                        // Clean up Three.js scene
+                        this.cleanupScene();
+
+                        // Remove existing canvas if it exists
+                        const existingCanvas =
+                            this.container.querySelector("canvas");
+                        if (existingCanvas) {
+                            existingCanvas.remove();
+                        }
+
+                        // Reset state
+                        this.isInitialized = false;
+                        this.animationId = null;
+
+                        // Reinitialize
+                        this.init();
+                    }
+                }
+
+                // Add cleanup method for Three.js scene
+                cleanupScene() {
+                    // Remove all objects from scene
+                    while (this.scene.children.length > 0) {
+                        const child = this.scene.children[0];
+                        this.scene.remove(child);
+
+                        // Dispose of geometry and materials if they exist
+                        if (child.geometry) {
+                            child.geometry.dispose();
+                        }
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach((material) =>
+                                    material.dispose(),
+                                );
+                            } else {
+                                child.material.dispose();
+                            }
+                        }
+                    }
+
+                    // Dispose of renderer
+                    if (this.renderer) {
+                        this.renderer.dispose();
+                    }
+
+                    // Reset physics world
+                    if (this.world) {
+                        this.world.bodies.forEach((body) => {
+                            this.world.removeBody(body);
+                        });
+                    }
+
+                    // Reset references
+                    this.emojis = [];
+                    this.walls = [];
+                    this.emojiTypes = {};
+                    this.emojiTypeOrder = [];
+                }
+
+                createWalls() {
+                    const aspect =
+                        this.container.clientWidth /
+                        this.container.clientHeight;
+                    const frustumSize = 20;
+                    const width = frustumSize * aspect;
+                    const height = frustumSize;
+                    const wallThickness = 2;
+
+                    this.walls.forEach((wall) => this.world.removeBody(wall));
+                    this.walls = [];
+
+                    const bottomWall = new CANNON.Body({ mass: 0 });
+                    bottomWall.addShape(
+                        new CANNON.Box(
+                            new CANNON.Vec3(width / 2, wallThickness / 2, 1),
+                        ),
+                    );
+                    bottomWall.position.set(
+                        0,
+                        -height / 2 - wallThickness / 2,
+                        0,
+                    );
+                    this.world.addBody(bottomWall);
+                    this.walls.push(bottomWall);
+
+                    const topWall = new CANNON.Body({ mass: 0 });
+                    topWall.addShape(
+                        new CANNON.Box(
+                            new CANNON.Vec3(width / 2, wallThickness / 2, 1),
+                        ),
+                    );
+                    topWall.position.set(0, height / 2 + wallThickness / 2, 0);
+                    this.world.addBody(topWall);
+                    this.walls.push(topWall);
+
+                    const leftWall = new CANNON.Body({ mass: 0 });
+                    leftWall.addShape(
+                        new CANNON.Box(
+                            new CANNON.Vec3(wallThickness / 2, height / 2, 1),
+                        ),
+                    );
+                    leftWall.position.set(-width / 2 - wallThickness / 2, 0, 0);
+                    this.world.addBody(leftWall);
+                    this.walls.push(leftWall);
+
+                    const rightWall = new CANNON.Body({ mass: 0 });
+                    rightWall.addShape(
+                        new CANNON.Box(
+                            new CANNON.Vec3(wallThickness / 2, height / 2, 1),
+                        ),
+                    );
+                    rightWall.position.set(width / 2 + wallThickness / 2, 0, 0);
+                    this.world.addBody(rightWall);
+                    this.walls.push(rightWall);
+                }
+
+                createEmojiTexture(emoji) {
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+                    canvas.width = textureSize;
+                    canvas.height = textureSize;
+
+                    context.clearRect(0, 0, textureSize, textureSize);
+
+                    context.font = "96px Arial";
+                    context.textAlign = "center";
+                    context.textBaseline = "middle";
+                    context.fillText(emoji, textureSize / 2, textureSize / 2);
+
+                    const texture = new THREE.CanvasTexture(canvas);
+                    texture.needsUpdate = true;
+                    return texture;
+                }
+
+                createInstancedMeshForEmojiType(emoji) {
+                    const geometry = new THREE.CircleGeometry(
+                        this.emojiSize,
+                        textureSize,
+                    );
+                    const texture = this.emojiTypes[emoji].texture;
+                    const material = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        transparent: true,
+                        side: THREE.DoubleSide,
+                    });
+
+                    const instancedMesh = new THREE.InstancedMesh(
+                        geometry,
+                        material,
+                        this.maxEmojis,
+                    );
+                    instancedMesh.instanceMatrix.setUsage(
+                        THREE.DynamicDrawUsage,
+                    );
+                    this.scene.add(instancedMesh);
+
+                    // Initially hide all instances
+                    const matrix = new THREE.Matrix4();
+                    matrix.makeScale(0, 0, 0); // Scale to 0 to hide
+                    for (let i = 0; i < this.maxEmojis; i++) {
+                        instancedMesh.setMatrixAt(i, matrix);
+                    }
+                    instancedMesh.instanceMatrix.needsUpdate = true;
+
+                    // Store geometry and material for cleanup if needed
+                    this.emojiTypes[emoji].geometry = geometry;
+                    this.emojiTypes[emoji].material = material;
+
+                    return instancedMesh;
+                }
+
+                setupEmoji(emoji) {
+                    if (!this.emojiTypes[emoji]) {
+                        const texture = this.createEmojiTexture(emoji);
+                        this.emojiTypes[emoji] = {
+                            texture,
+                            instancedMesh: null,
+                            geometry: null,
+                            material: null,
+                            count: 0,
+                        };
+                        this.emojiTypes[emoji].instancedMesh =
+                            this.createInstancedMeshForEmojiType(emoji);
+                        this.emojiTypeOrder.push(emoji);
+                    }
+                }
+
+                createEmoji(x, y, velocityX = 0, velocityY = 0) {
+                    if (this.emojis.length >= this.maxEmojis) {
+                        this.removeOldestEmoji();
+                    }
+
+                    this.setupEmoji(this.emojiChars[this.emojiIndex]);
+
+                    const emojiType =
+                        this.emojiTypes[this.emojiChars[this.emojiIndex]];
+                    const instanceIndex = emojiType.count;
+
+                    const body = new CANNON.Body({
+                        mass: 0.5 + Math.random() * 1,
+                        material: new CANNON.Material({
+                            friction: 0.02,
+                            restitution: 0.0,
+                        }),
+                    });
+                    body.addShape(new CANNON.Sphere(this.emojiSize * 0.38));
+                    body.position.set(x, y, 0);
+
+                    // Individual randomized velocity
+                    const randomX = (Math.random() - 0.5) * 0.4;
+                    const randomY = (Math.random() - 0.5) * 0.2;
+
+                    body.velocity.set(
+                        velocityX + randomX,
+                        velocityY + randomY,
+                        0,
+                    );
+
+                    const speed = Math.sqrt(
+                        velocityX * velocityX + velocityY * velocityY,
+                    );
+                    body.angularVelocity.set(
+                        0,
+                        0,
+                        speed * 0.5 * (Math.random() - 0.5) * 2,
+                    );
+
+                    body.linearDamping = 0.01;
+                    body.angularDamping = 0.02;
+
+                    this.world.addBody(body);
+
+                    const emojiObj = {
+                        body,
+                        instanceIndex,
+                        emojiType: this.emojiChars[this.emojiIndex],
+                    };
+                    this.emojis.push(emojiObj);
+
+                    const matrix = new THREE.Matrix4();
+
+                    matrix.makeTranslation(x, y, 0);
+                    emojiType.instancedMesh.setMatrixAt(instanceIndex, matrix);
+                    emojiType.instancedMesh.instanceMatrix.needsUpdate = true;
+
+                    emojiType.count++;
+
+                    this.updateEmojiCount();
+                }
+
+                setupEmojiTextures() {
+                    this.emojiChars.forEach((emoji) => {
+                        this.setupEmoji(emoji);
+                    });
+                }
+
+                createEmojiFountain(x, y, continuous = false) {
+                    const emojiCount = continuous
+                        ? 3
+                        : 8 + Math.floor(Math.random() * 7);
+                    const fountainForce = 4;
+
+                    for (let i = 0; i < emojiCount; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+
+                        const distance =
+                            Math.random() * (continuous ? 0.5 : 1.0);
+                        const offsetX = Math.cos(angle) * distance;
+                        const offsetY = Math.sin(angle) * distance;
+
+                        const velocityMagnitude =
+                            fountainForce * (0.5 + Math.random() * 0.5);
+                        const velocityAngle =
+                            angle + (Math.random() - 0.5) * 0.3;
+                        const velocityX =
+                            Math.cos(velocityAngle) * velocityMagnitude;
+                        const velocityY =
+                            Math.sin(velocityAngle) * velocityMagnitude +
+                            Math.random() * 2;
+
+                        const delay = continuous ? i * 10 : i * 20;
+                        setTimeout(() => {
+                            this.emojiIndex =
+                                (this.emojiIndex + 1) % this.emojiChars.length;
+                            this.createEmoji(
+                                x + offsetX,
+                                y + offsetY,
+                                velocityX,
+                                velocityY,
+                            );
+                        }, delay);
+                    }
+                }
+
+                startContinuousSpawning() {
+                    if (this.spawnInterval) return;
+
+                    this.spawnInterval = setInterval(() => {
+                        if (this.isMouseDown) {
+                            this.createEmojiFountain(
+                                this.mouse.x,
+                                this.mouse.y,
+                                true,
+                            );
+                        }
+                    }, 80);
+                }
+
+                stopContinuousSpawning() {
+                    if (this.spawnInterval) {
+                        clearInterval(this.spawnInterval);
+                        this.spawnInterval = null;
+                    }
+                }
+
+                removeOldestEmoji() {
+                    if (this.emojis.length === 0) return;
+
+                    const emojiObj = this.emojis.shift();
+                    this.world.removeBody(emojiObj.body);
+
+                    const emojiType = this.emojiTypes[emojiObj.emojiType];
+                    const matrix = new THREE.Matrix4();
+                    matrix.makeScale(0, 0, 0);
+                    emojiType.instancedMesh.setMatrixAt(
+                        emojiObj.instanceIndex,
+                        matrix,
+                    );
+                    emojiType.instancedMesh.instanceMatrix.needsUpdate = true;
+
+                    let typeCount = 0;
+                    for (let i = 0; i < this.emojis.length; i++) {
+                        if (this.emojis[i].emojiType === emojiObj.emojiType) {
+                            this.emojis[i].instanceIndex = typeCount;
+                            typeCount++;
+                        }
+                    }
+                    emojiType.count = typeCount;
+
+                    this.updateEmojiCount();
+                }
+
+                updateEmojiCount() {
+                    // const clearButton = document.querySelector('[data-clear-emojis]');
+
+                    // if (this.emojis.length === 0) {
+                    //     clearButton.disabled = true;
+                    // } else {
+                    //     clearButton.disabled = false;
+                    // }
+
+                    const counter = document.getElementById("emojiCount");
+                    if (counter) {
+                        counter.textContent = this.emojis.length;
+                    }
+                }
+
+                screenToWorld(screenX, screenY) {
+                    // Get the bounding rect of the container to get offset within the page
+                    const rect = this.container.getBoundingClientRect();
+                    const aspect =
+                        this.container.clientWidth /
+                        this.container.clientHeight;
+                    const frustumSize = 20;
+
+                    // Calculate mouse position relative to the container
+                    const localX = screenX - rect.left;
+                    const localY = screenY - rect.top;
+
+                    const x =
+                        ((localX / this.container.clientWidth) * 2 - 1) *
+                        ((frustumSize * aspect) / 2);
+                    const y =
+                        (-(localY / this.container.clientHeight) * 2 + 1) *
+                        (frustumSize / 2);
+
+                    return { x, y };
+                }
+
+                removeEmptyState() {
+                    this.emptyStateVisible = false;
+
+                    gsap.to(this.emptyState, {
+                        opacity: 0,
+                        scale: 0.95,
+                        ease: "expo.out",
+                        duration: 0.65,
+                        onComplete: () => {
+                            this.emptyState.remove();
+                        },
+                    });
+                }
+
+                clearEmojis() {
+                    this.emojis.forEach((emoji) =>
+                        this.world.removeBody(emoji.body),
+                    );
+
+                    this.emojis = [];
+                    this.updateEmojiCount();
+                }
+
+                setupEventListeners() {
+                    const canvas = this.renderer.domElement;
+
+                    canvas.addEventListener("touchstart", (event) => {
+                        this.removeEmptyState();
+                        const worldPos = this.screenToWorld(
+                            event.touches[0].clientX,
+                            event.touches[0].clientY,
+                        );
+                        this.mouse.x = worldPos.x;
+                        this.mouse.y = worldPos.y;
+                        this.isMouseDown = true;
+
+                        this.createEmojiFountain(worldPos.x, worldPos.y);
+
+                        this.startContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("touchmove", (event) => {
+                        const worldPos = this.screenToWorld(
+                            event.touches[0].clientX,
+                            event.touches[0].clientY,
+                        );
+                        this.mouse.x = worldPos.x;
+                        this.mouse.y = worldPos.y;
+                    });
+
+                    canvas.addEventListener("touchend", () => {
+                        this.isMouseDown = false;
+                        this.stopContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("touchleave", () => {
+                        this.isMouseDown = false;
+                        this.stopContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("touchcancel", () => {
+                        this.isMouseDown = false;
+                        this.stopContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("mousedown", (event) => {
+                        this.removeEmptyState();
+                        const worldPos = this.screenToWorld(
+                            event.clientX,
+                            event.clientY,
+                        );
+                        this.mouse.x = worldPos.x;
+                        this.mouse.y = worldPos.y;
+                        this.isMouseDown = true;
+
+                        this.createEmojiFountain(worldPos.x, worldPos.y);
+
+                        this.startContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("mouseup", () => {
+                        this.isMouseDown = false;
+                        this.stopContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("mouseleave", () => {
+                        this.isMouseDown = false;
+                        this.stopContinuousSpawning();
+                    });
+
+                    canvas.addEventListener("mousemove", (event) => {
+                        const worldPos = this.screenToWorld(
+                            event.clientX,
+                            event.clientY,
+                        );
+                        this.mouse.x = worldPos.x;
+                        this.mouse.y = worldPos.y;
+                    });
+
+                    window.addEventListener("resize", () => {
+                        const aspect =
+                            this.container.clientWidth /
+                            this.container.clientHeight;
+                        const frustumSize = 20;
+
+                        this.camera.left = (-frustumSize * aspect) / 2;
+                        this.camera.right = (frustumSize * aspect) / 2;
+                        this.camera.top = frustumSize / 2;
+                        this.camera.bottom = -frustumSize / 2;
+                        this.camera.updateProjectionMatrix();
+
+                        this.renderer.setSize(
+                            this.container.clientWidth,
+                            this.container.clientHeight,
+                        );
+
+                        this.createWalls();
+                    });
+                }
+
+                animate() {
+                    this.animationId = requestAnimationFrame(
+                        this.animate.bind(this),
+                    );
+
+                    this.world.step(1 / 60, 0, 6);
+
+                    for (const emoji of this.emojiTypeOrder) {
+                        const emojiType = this.emojiTypes[emoji];
+                        if (!emojiType) continue;
+                        const instancedMesh = emojiType.instancedMesh;
+                        let typeIndex = 0;
+                        const matrix = new THREE.Matrix4();
+                        const rotMatrix = new THREE.Matrix4();
+
+                        for (let i = 0; i < this.emojis.length; i++) {
+                            const emojiObj = this.emojis[i];
+                            if (emojiObj.emojiType !== emoji) continue;
+
+                            emojiObj.body.position.z = 0;
+                            emojiObj.body.velocity.z = 0;
+                            emojiObj.body.angularVelocity.x = 0;
+                            emojiObj.body.angularVelocity.y = 0;
+
+                            const rotation =
+                                emojiObj.body.quaternion.toAxisAngle()[1];
+                            matrix.makeTranslation(
+                                emojiObj.body.position.x,
+                                emojiObj.body.position.y,
+                                0,
+                            );
+                            rotMatrix.makeRotationZ(rotation);
+                            matrix.multiply(rotMatrix);
+
+                            instancedMesh.setMatrixAt(typeIndex, matrix);
+                            typeIndex++;
+                        }
+
+                        // Cleanup
+                        for (let i = typeIndex; i < this.maxEmojis; i++) {
+                            const hideMatrix = new THREE.Matrix4();
+                            hideMatrix.makeScale(0, 0, 0);
+                            instancedMesh.setMatrixAt(i, hideMatrix);
+                        }
+
+                        if (emojiType.count > 0) {
+                            instancedMesh.instanceMatrix.needsUpdate = true;
+                        }
+                    }
+
+                    this.renderer.render(this.scene, this.camera);
+                }
+            }
+
+            // Initialize the demo when the page loads
+            let gravityDemoInstance = null;
+
+            window.addEventListener("DOMContentLoaded", () => {
+                console.log("DOM loaded, initializing demo...");
+
+                // Check if Three.js and Cannon.js are loaded
+                if (typeof THREE === "undefined") {
+                    console.error("Three.js not loaded!");
+                    return;
+                }
+
+                if (typeof CANNON === "undefined") {
+                    console.error("Cannon.js not loaded!");
+                    return;
+                }
+
+                gravityDemoInstance = new EmojiPhysicsDemo();
+            });
+
+            // Listen for tab changes to reinitialize gravity demo
+            document.addEventListener("DOMContentLoaded", () => {
+                // Find the gravity tab panel
+                const gravityPanel = document
+                    .querySelector("[data-gravity-canvas-container]")
+                    ?.closest('[data-tabs="panel"]');
+
+                if (gravityPanel) {
+                    // Use MutationObserver to detect when the panel becomes visible
+                    const observer = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            if (
+                                mutation.type === "attributes" &&
+                                mutation.attributeName === "hidden"
+                            ) {
+                                if (
+                                    !gravityPanel.hidden &&
+                                    gravityDemoInstance
+                                ) {
+                                    // Tab became visible, reinitialize the demo
+                                    setTimeout(() => {
+                                        gravityDemoInstance.reinitialize();
+                                    }, 100); // Small delay to ensure DOM is ready
+                                }
+                            }
+                        });
+                    });
+
+                    observer.observe(gravityPanel, {
+                        attributes: true,
+                        attributeFilter: ["hidden"],
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>
