@@ -2,6 +2,21 @@
 
 这个项目包含两个令人惊叹的Three.js交互式可视化演示，直接从Claude Code官方网站提取，并完全分离为独立的HTML、CSS和JavaScript文件。
 
+## 📸 效果预览
+
+<p align="center">
+  <img src="images/demo-preview1.png" alt="天文学星图演示" width="49%">
+  <img src="images/demo-preview2.png" alt="重力表情符号演示" width="49%">
+</p>
+
+<p align="center">
+  <a href="https://claude.com/product/claude-code">
+    <img src="https://img.shields.io/badge/Built_with-Claude_Code-5865F2?style=for-the-badge&logo=anthropic" alt="Built with Claude Code">
+  </a>
+</p>
+
+> 本项目由 [Claude Code](https://claude.com/product/claude-code) 辅助开发，展示了 AI 辅助编程在创建交互式 3D 可视化方面的能力。
+
 ## 📁 项目文件结构
 
 ```
@@ -133,6 +148,12 @@ npx http-server -p 8000
 - B-V色指数到RGB颜色映射
 - 视星等到粒子大小映射
 
+### 📸 效果展示
+
+<p align="center">
+  <img src="images/astronomy-demo.png" alt="天文学星图演示" width="700">
+</p>
+
 ---
 
 ## 😀 演示2: 重力表情符号物理演示
@@ -191,6 +212,12 @@ npx http-server -p 8000
 - 重力: -9.82 m/s²
 - 碰撞材料系统 (摩擦力、弹性)
 - 随机初始速度和角速度
+
+### 📸 效果展示
+
+<p align="center">
+  <img src="images/gravity-demo.png" alt="重力表情符号演示" width="700">
+</p>
 
 ---
 
@@ -351,19 +378,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
 ### 文件分离的优势
 
-✅ **模块化**: HTML、CSS、JS完全分离，易于维护
-✅ **可读性**: 每个文件职责单一，代码清晰
-✅ **可复用**: CSS和JS可以在其他项目中复用
-✅ **易调试**: 独立文件便于定位和修复问题
-✅ **协作友好**: 不同开发者可以并行修改不同文件
+- ✅ **模块化**: HTML、CSS、JS完全分离，易于维护
+- ✅ **可读性**: 每个文件职责单一，代码清晰
+- ✅ **可复用**: CSS和JS可以在其他项目中复用
+- ✅ **易调试**: 独立文件便于定位和修复问题
+- ✅ **协作友好**: 不同开发者可以并行修改不同文件
 
 ### 性能优化
 
-🚀 **文件大小**: 分离版本总计66KB (不含数据文件)
-🚀 **加载速度**: 独立文件支持浏览器并行下载
-🚀 **缓存友好**: CSS和JS可以被浏览器缓存
-🚀 **CDN加速**: 第三方库使用CDN加速
-🚀 **实例化渲染**: 使用InstancedMesh和BufferGeometry优化性能
+- 🚀 **文件大小**: 分离版本总计66KB (不含数据文件)
+- 🚀 **加载速度**: 独立文件支持浏览器并行下载
+- 🚀 **缓存友好**: CSS和JS可以被浏览器缓存
+- 🚀 **CDN加速**: 第三方库使用CDN加速
+- 🚀 **实例化渲染**: 使用InstancedMesh和BufferGeometry优化性能
 
 ---
 
@@ -380,7 +407,7 @@ MIT License
 - **Three.js** - 强大的3D JavaScript库
 - **Cannon.js** - 轻量级物理引擎
 - **GSAP** - 专业级动画库
-- **Claude Code** - 原始示例来源
+- **Claude Code** - [https://claude.com/product/claude-code](https://claude.com/product/claude-code) - AI 辅助编程工具，原始示例来源
 - **Anthropic** - Claude AI开发团队
 
 ---
