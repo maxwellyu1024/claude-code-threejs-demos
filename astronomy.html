@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 天文学星图可视化 - Three.js Demo</title>
+    <link rel="stylesheet" href="astronomy.css">
+</head>
+<body>
+    <div class="site-container">
+        <div class="claude-astronomy-demo" data-astronomy-demo>
+      <div class="info">
+        <h2 class="info__title">
+          <span>╭────────────────────────────╮</span>
+          <span>│ │</span>
+          <span>│ ✶ <span class="info__title-label">Welcome to Claude Code!</span> │</span>
+          <span>│ │</span>
+          <span>╰────────────────────────────╯</span>
+        </h2>
+
+        <p>> Please create an interactive Three.js cosmos visualization using star catalog data found in data.json</p>
+
+        <div class="info__todos">
+          <h3 class="info__todos-title">Update Todos</h3>
+          <ul class="info__todos-list">
+            <li>☒ Initialize Three.js scene</li>
+            <li>☒ Parse star data into 3D coordinates</li>
+            <li>☒ Create particle system for stars</li>
+            <li>☒ Mouse orbit and zoom controls</li>
+            <li>☒ Star brightness and color mapping</li>
+          </ul>
+        </div>
+
+        <p>Done! Navigate through <span data-star-count>50,000</span> real stars. Take a look and let me know your thoughts.</p>
+      </div>
+
+
+      <div class="claude-astronomy-demo__canvas-container" data-astronomy-canvas-container>
+        <div data-astronomy-empty-state class="demo-empty-state">
+          <div class="demo-empty-state__icon">
+            <svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.5 4.5C25.9558 4.5 32 10.5442 32 18C32 25.4558 25.9558 31.5 18.5 31.5C11.0442 31.5 5 25.4558 5 18C5 10.5442 11.0442 4.5 18.5 4.5ZM18.5 6.3C12.0383 6.3 6.8 11.5383 6.8 18C6.8 24.4617 12.0383 29.7 18.5 29.7C24.9617 29.7 30.2 24.4617 30.2 18C30.2 11.5383 24.9617 6.3 18.5 6.3ZM18.6811 16.2176C19.0914 16.3013 19.4 16.6649 19.4 17.1V22.5H21.2C21.6971 22.5 22.1 22.9029 22.1 23.4C22.1 23.8971 21.6971 24.3 21.2 24.3H15.8C15.3029 24.3 14.9 23.8971 14.9 23.4C14.9 22.9029 15.3029 22.5 15.8 22.5H17.6V18H15.8C15.3029 18 14.9 17.5971 14.9 17.1C14.9 16.6029 15.3029 16.2 15.8 16.2H18.5L18.6811 16.2176ZM18.5 11.7C19.2456 11.7 19.85 12.3044 19.85 13.05C19.85 13.7956 19.2456 14.4 18.5 14.4C17.7544 14.4 17.15 13.7956 17.15 13.05C17.15 12.3044 17.7544 11.7 18.5 11.7Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <p class="demo-empty-state__text">Loading stars...</p>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="astronomy.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>重力表情符号演示 - Emoji Physics Demo</title>
+    <link rel="stylesheet" href="gravity.css">
+</head>
+<body>
+    <div class="claude-gravity-demo" data-gravity-demo>
+        <div class="info">
+            <h2 class="info__title">
+                <span>╭────────────────────────────╮</span>
+                <span>│                            │</span>
+                <span>│ ✶ <span class="info__title-label">Welcome to Claude Code!</span>  │</span>
+                <span>│                            │</span>
+                <span>╰────────────────────────────╯</span>
+            </h2>
+
+            <p>> Create an interactive tool that shoots out emojis using real-world physics</p>
+
+            <div class="info__todos">
+                <h3 class="info__todos-title">Update Todos</h3>
+                <ul class="info__todos-list">
+                    <li>☒ Setup scene</li>
+                    <li>☒ Set up Cannon.js physics world with gravity</li>
+                    <li>☒ Build instanced mesh system for performance</li>
+                    <li>☒ Apply physics bodies with random velocity/spin</li>
+                    <li>☒ Continuous spawning while mouse held down</li>
+                    <li>☒ Auto-cleanup when reaching max emoji limit</li>
+                </ul>
+            </div>
+
+            <p>Done! Click and hold to create emoji fountains with realistic physics. Take a look and let me know your thoughts.</p>
+        </div>
+
+        <div class="claude-gravity-demo__canvas-container" data-gravity-canvas-container>
+            <div data-gravity-empty-state class="demo-empty-state">
+                <div class="demo-empty-state__icon">
+                    <svg
+                        width="37"
+                        height="36"
+                        viewBox="0 0 37 36"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M18.0108 5.18311C18.5572 3.79595 20.1251 3.11311 21.5123 3.65909L26.5379 5.63839C27.9248 6.18499 28.6062 7.75286 28.0602 9.13995L21.0026 27.0556C20.8316 27.4894 20.5509 27.8707 20.1905 28.163L20.0323 28.2825L14.3739 32.2165C13.6324 32.732 12.6223 32.3854 12.3313 31.5644L12.2838 31.3939L10.8266 24.6579C10.714 24.1369 10.7596 23.5929 10.9549 23.097L18.0108 5.18311ZM12.6283 23.7579C12.5636 23.9228 12.5489 24.1033 12.5862 24.2765L13.901 30.3532L19.0039 26.806L19.1076 26.7216C19.2036 26.6312 19.2786 26.52 19.3274 26.3964L24.0752 14.3413L17.3762 11.7028L12.6283 23.7579ZM20.8532 5.33429C20.3907 5.15221 19.8681 5.37987 19.686 5.84229L18.0354 10.0276L24.7344 12.6679L26.385 8.48077C26.5671 8.01831 26.3394 7.49575 25.877 7.31358L20.8532 5.33429Z"
+                            fill="currentColor"
+                        />
+                    </svg>
+                </div>
+                <p class="demo-empty-state__text">
+                    Click and drag to draw emojis
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cannon.js 物理引擎 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+
+    <!-- GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js"
+        }
+    }
+    </script>
+
+    <!-- 主要脚本 -->
+    <script type="module" src="gravity.js"></script>
+</body>
+</html>

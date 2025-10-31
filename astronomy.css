@@ -1,0 +1,258 @@
+/* 天文学星图可视化样式 */
+
+/* ==================== 全局样式 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Anthropic Mono", "Courier New", monospace;
+    background-color: #000;
+}
+
+/* ==================== CSS变量 ==================== */
+:root {
+    --gutter: 16px;
+    --grid-cols: 6;
+    --spacing-horz: 32px;
+
+    --color-clay: #d97757;
+    --color-clay-shimmer: rgba(217, 119, 87, 0.5);
+    --color-olive: #788c5d;
+    --color-dark-grey: #1e1e1e;
+    --color-white: #faf9f5;
+    --color-true-white: #ffffff;
+    --color-light-grey: #b0aea5;
+    --color-fg-tertiary: #5e5d59;
+
+    --font-size-body-3: 15px;
+    --line-height-body-3: 130%;
+    --letter-spacing-body-3: 0em;
+    --font-weight-body-3: 400;
+
+    --radius-xs: 10px;
+    --radius-sm: 24px;
+}
+
+/* ==================== 容器样式 ==================== */
+.site-container {
+    width: 100%;
+    padding-inline: var(--spacing-horz);
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== 天文学演示样式 ==================== */
+.claude-astronomy-demo canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+.claude-astronomy-demo canvas:active {
+    cursor: grabbing;
+}
+
+.claude-astronomy-demo .info {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    color: var(--color-white);
+    padding: 20px;
+
+    font-size: var(--font-size-body-3);
+    line-height: var(--line-height-body-3);
+    letter-spacing: var(--letter-spacing-body-3);
+    font-weight: var(--font-weight-body-3);
+}
+
+.claude-astronomy-demo .info__title {
+    display: flex;
+    flex-direction: column;
+    white-space: pre;
+    color: var(--color-clay);
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+.claude-astronomy-demo .info__title-label {
+    color: var(--color-white);
+}
+
+.claude-astronomy-demo .info__list-item-desktop {
+    display: none;
+}
+
+.claude-astronomy-demo .info__todos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 10px;
+    padding-left: 20px;
+}
+
+.claude-astronomy-demo .info__todos-title {
+    color: var(--color-white);
+    font-weight: 700;
+    position: relative;
+}
+.claude-astronomy-demo .info__todos-title::before {
+        content: '';
+        position: absolute;
+        top: calc(50% - 1px);
+        right: calc(100% + 12px);
+        width: 8px;
+        height: 8px;
+        background-color: var(--color-olive);
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+.claude-astronomy-demo .info__todos-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    text-align: left;
+    color: var(--color-olive);
+    padding-left: 18px;
+}
+
+.claude-astronomy-demo .info__todos-list li:first-child {
+    position: relative;
+}
+.claude-astronomy-demo .info__todos-list li:first-child::before {
+        content: '⎿';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        right: calc(100% + 8px);
+    }
+
+.claude-astronomy-demo .loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-white);
+    font-size: 12px;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.claude-astronomy-demo {
+    width: 100%;
+    max-width: 1440px;
+    background-color: black;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    display: flex;
+    font-family: "Anthropic Mono", monospace;
+}
+
+.claude-astronomy-demo__canvas-container {
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* ==================== 空状态样式 ==================== */
+.demo-empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: 18px;
+    width: 250px;
+    height: 250px;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='24' ry='24' stroke='%23C2C0B6FF' stroke-width='1.5' stroke-dasharray='6%2c6' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e");
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-body-3);
+    line-height: var(--line-height-body-3);
+    letter-spacing: var(--letter-spacing-body-3);
+    font-weight: var(--font-weight-body-3);
+    color: var(--color-fg-tertiary);
+}
+
+.demo-empty-state__icon {
+    width: 36px;
+    height: 36px;
+}
+
+.demo-empty-state__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.demo-empty-state__text {
+    max-width: 180px;
+    text-align: center;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 800px) {
+    .claude-astronomy-demo {
+        flex-direction: column-reverse;
+    }
+
+    .claude-astronomy-demo .info {
+        padding-top: 10px;
+        max-height: 200px;
+        overflow-x: clip;
+        overflow-y: auto;
+        flex: unset;
+        mask-image: linear-gradient(to bottom, transparent 0%, black 20px);
+        font-size: 12px;
+        row-gap: 20px;
+    }
+
+    .claude-astronomy-demo .info__title {
+        font-size: 12px;
+    }
+
+    .claude-astronomy-demo__canvas-container {
+        width: 100%;
+        flex: 1;
+        aspect-ratio: 4/5;
+        mask-image: linear-gradient(to top, transparent 0%, black 20px);
+    }
+}
+
+@media (min-width: 800px) {
+    .info__list-item-desktop {
+        display: block;
+    }
+
+    .info__list-item-mobile {
+        display: none;
+    }
+
+    .claude-astronomy-demo__canvas-container {
+        width: 66%;
+        mask-image: linear-gradient(to right, transparent 0%, black 40px);
+        min-height: 680px;
+    }
+}
+
+
+
