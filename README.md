@@ -1,11 +1,11 @@
-# 🌌 Three.js 可视化演示项目
+# 🌌 Claude Code Three.js Demos
 
 这个项目包含两个令人惊叹的Three.js交互式可视化演示，直接从Claude Code官方网站提取，并完全分离为独立的HTML、CSS和JavaScript文件。
 
 ## 📁 项目文件结构
 
 ```
-cosmos-visualization/
+claude-code-threejs-demos/
 ├── astronomy.html              # 天文学星图HTML结构 (3.2KB)
 ├── astronomy.css               # 天文学星图样式文件 (6.2KB)
 ├── astronomy.js                # 天文学星图JavaScript代码 (25KB)
